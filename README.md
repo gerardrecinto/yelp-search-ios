@@ -5,12 +5,14 @@
 ![UIKit](https://img.shields.io/badge/UIKit-Auto%20Layout-blue)
 ![Yelp API](https://img.shields.io/badge/API-Yelp%20v2-FF1A1A)
 
-An iOS restaurant search app built with Swift and UIKit, powered by the Yelp API.
+![Demo](docs/assets/demo2.gif)
+
+Restaurant search app powered by the Yelp API with dynamic-height table cells and a navigation bar search bar.
 
 ## Features
 
 - Restaurant search with results in a dynamic-height table view
-- Auto Layout constraints for variable-length business names and addresses
+- Auto Layout for variable-length business names and addresses
 - Search bar integrated in the navigation bar
 - Custom table view cells with proper content sizing
 
@@ -26,14 +28,10 @@ An iOS restaurant search app built with Swift and UIKit, powered by the Yelp API
 ## Setup
 
 ```bash
-git clone https://github.com/gerardrecinto/yelp2.git
-cd yelp2
+git clone https://github.com/gerardrecinto/yelp-search-ios.git
+cd yelp-search-ios
 pod install
 open Yelp.xcworkspace
 ```
 
 Add your Yelp API key before building.
-
-## Demo
-
-![Demo](https://imgur.com/VzSqe6H.gif)
