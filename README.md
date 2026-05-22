@@ -1,5 +1,10 @@
 # Yelp Search
 
+![Swift](https://img.shields.io/badge/Swift-3%2B-F05138?logo=swift&logoColor=white)
+![iOS 9+](https://img.shields.io/badge/iOS-9%2B-000000?logo=apple&logoColor=white)
+![UIKit](https://img.shields.io/badge/UIKit-Auto%20Layout-blue)
+![Yelp API](https://img.shields.io/badge/API-Yelp%20v2-FF1A1A)
+
 An iOS restaurant search app built with Swift and UIKit, powered by the Yelp API.
 
 ## Features
