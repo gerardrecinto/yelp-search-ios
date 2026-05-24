@@ -2,77 +2,73 @@
 //  BusinessesViewController.swift
 //  Yelp
 //
-//  Created by Timothy Lee on 4/23/15.
-//  Copyright (c) 2015 Timothy Lee. All rights reserved.
+//  Created by Gerard Recinto on 2017.
+//  Copyright © 2017 Gerard Recinto. All rights reserved.
 //
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
-  @IBOutlet weak var tableView: UITableView!
-  var businesses: [Business]!
-  
-    
+@MainActor
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+
+    @IBOutlet weak var tableView: UITableView!
+
+    private var businesses: [Business] = []
+    private var filteredBusinesses: [Business] = []
+    private lazy var searchBar = UISearchBar()
+
+    private var isSearching: Bool {
+        !(searchBar.text?.isEmpty ?? true)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.delegate = self
-      self.tableView.dataSource = self
-      self.tableView.rowHeight = UITableViewAutomaticDimension
-      self.tableView.estimatedRowHeight = 120
-      
-        Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
-            
-            self.businesses = businesses
-          self.tableView.reloadData()
-            if let businesses = businesses {
-                for business in businesses {
-                    print(business.name!)
-                    print(business.address!)
-                }
+        searchBar.delegate = self
+        searchBar.sizeToFit()
+        navigationItem.titleView = searchBar
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 100
+        loadBusinesses(term: "Restaurants")
+    }
+
+    private func loadBusinesses(term: String) {
+        YelpClient.shared.searchBusinesses(term: term) { [weak self] results in
+            self?.businesses = results
+            self?.filteredBusinesses = results
+            self?.tableView.reloadData()
+        }
+    }
+
+    // MARK: - UISearchBarDelegate
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            filteredBusinesses = businesses
+        } else {
+            filteredBusinesses = businesses.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText)
             }
-            
-            }
-        )
-        
-        /* Example of Yelp search with more search options specified
-         Business.searchWithTerm("Restaurants", sort: .distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: Error!) -> Void in
-         self.businesses = businesses
-         
-         for business in businesses {
-         print(business.name!)
-         print(business.address!)
-         }
-         }
-         */
-        
+        }
+        tableView.reloadData()
     }
-  
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if businesses != nil{
-      return businesses!.count
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        loadBusinesses(term: searchBar.text ?? "")
     }
-    return 0
-  }
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "BusinessCell", for: indexPath) as! BusinessCell
-    cell.business = businesses[indexPath.row]
-    return cell
-  }
-  
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+
+    // MARK: - UITableViewDataSource
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        isSearching ? filteredBusinesses.count : businesses.count
     }
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
-    
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "BusinessCell", for: indexPath) as! BusinessCell
+        let business = isSearching ? filteredBusinesses[indexPath.row] : businesses[indexPath.row]
+        cell.business = business
+        return cell
+    }
 }
